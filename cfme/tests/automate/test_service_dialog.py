@@ -1,7 +1,9 @@
 import cfme.web_ui.flash as flash
 from cfme.automate.service_dialogs import ServiceDialog
 import utils.randomness as rand
+import pytest
 
+pytestmark = [pytest.mark.usefixtures("logged_in")]
 
 def test_create_service_dialog():
     dialog = ServiceDialog(label=rand.generate_random_string(),
