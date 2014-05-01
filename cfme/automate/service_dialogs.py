@@ -5,9 +5,8 @@ from selenium.webdriver.common.by import By
 
 import cfme.fixtures.pytest_selenium as sel
 import cfme.web_ui as web_ui
-import cfme.web_ui.accordion as accordion
 import cfme.web_ui.toolbar as tb
-from cfme.web_ui import Form, fill, Select
+from cfme.web_ui import Form, fill, Select, accordion
 from utils.update import Updateable
 
 
@@ -16,7 +15,6 @@ plus_btn = functools.partial(tb.select, "Add")
 message = (By.CSS_SELECTOR, "div#flash_msg_div")
 service_dialog_tree = web_ui.Tree('//div[@id="dialogs_treebox"]/div/table')
 save_btn = (By.CSS_SELECTOR, "img[title='Save Changes']")
-
 
 label_form = Form(
     fields=
