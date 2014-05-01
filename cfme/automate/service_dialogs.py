@@ -4,6 +4,7 @@ import ui_navigate as nav
 from selenium.webdriver.common.by import By
 
 import cfme.fixtures.pytest_selenium as sel
+import cfme.web_ui as web_ui
 import cfme.web_ui.accordion as accordion
 import cfme.web_ui.toolbar as tb
 from cfme.web_ui import Form, fill, Select
@@ -13,6 +14,9 @@ from utils.update import Updateable
 cfg_btn = functools.partial(tb.select, "Configuration")
 plus_btn = functools.partial(tb.select, "Add")
 message = (By.CSS_SELECTOR, "div#flash_msg_div")
+service_dialog_tree = web_ui.Tree('//div[@id="dialogs_treebox"]/div/table')
+save_btn = (By.CSS_SELECTOR, "img[title='Save Changes']")
+
 
 label_form = Form(
     fields=
@@ -49,7 +53,9 @@ def _all_servicedialogs_add_new(context):
 nav.add_branch(
     'automate_customization',
     {'service_dialogs': [nav.partial(accordion.click, 'Service Dialogs'),
-                       {'service_dialog_new': _all_servicedialogs_add_new}]})
+        {'service_dialog_new': _all_servicedialogs_add_new,
+         'service_dialog': [lambda ctx: service_dialog_tree.click_path(ctx['dialog'].label),
+            {'service_dialog_edit': nav.partial(cfg_btn, "Edit this Dialog")}]}]})
 
 
 class ServiceDialog(Updateable):
@@ -80,7 +86,6 @@ class ServiceDialog(Updateable):
                           'description_text': self.description,
                           'submit_button': self.submit,
                           'cancel_button': self.cancel})
-        print self.tab_label
         if(self.tab_label is not None):
             plus_btn("Add a New Tab to this Dialog")
             sel.wait_for_element(tab_form.tab_label)
@@ -101,3 +106,17 @@ class ServiceDialog(Updateable):
                             'default_text_box': self.default_text_box})
         sel.click(element_form.add_button)
         sel.wait_for_element(message)
+
+    def update(self, updates):
+        sel.force_navigate('service_dialog_edit',
+            context={'dialog': self})
+        fill(label_form, {'name_text': updates.get('name', None),
+                          'description_text': updates.get('description', None)})
+        sel.wait_for_element(save_btn)
+        sel.click(save_btn)
+        sel.wait_for_element(message)
+
+    def delete(self):
+        sel.force_navigate('service_dialog', context={'dialog': self})
+        cfg_btn("Remove from the VMDB", invokes_alert=True)
+        sel.handle_alert()
