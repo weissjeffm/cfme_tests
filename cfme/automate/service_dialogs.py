@@ -1,6 +1,9 @@
 import functools
 
 import ui_navigate as nav
+from selenium.webdriver.common.by import By
+from cfme.web_ui import menu, flash
+assert menu
 
 import cfme.fixtures.pytest_selenium as sel
 import cfme.web_ui as web_ui
@@ -59,11 +62,11 @@ nav.add_branch(
 class ServiceDialog(Updateable):
 
     def __init__(self, label=None, description=None,
-        submit=False, cancel=False,
-        tab_label=None, tab_desc=None,
-        box_label=None, box_desc=None,
-        ele_label=None, ele_name=None,
-        ele_desc=None, choose_type=None, default_text_box=None):
+                 submit=False, cancel=False,
+                 tab_label=None, tab_desc=None,
+                 box_label=None, box_desc=None,
+                 ele_label=None, ele_name=None,
+                 ele_desc=None, choose_type=None, default_text_box=None):
         self.label = label
         self.description = description
         self.submit = submit
@@ -103,7 +106,6 @@ class ServiceDialog(Updateable):
                             'choose_type': self.choose_type,
                             'default_text_box': self.default_text_box})
         sel.click(element_form.add_button)
-        sel.wait_for_element(message)
         flash.assert_no_errors()
 
     def update(self, updates):
@@ -111,9 +113,7 @@ class ServiceDialog(Updateable):
             context={'dialog': self})
         fill(label_form, {'name_text': updates.get('name', None),
                           'description_text': updates.get('description', None)})
-        sel.wait_for_element(save_btn)
         sel.click(save_btn)
-        sel.wait_for_element(message)
         flash.assert_no_errors()
 
     def delete(self):

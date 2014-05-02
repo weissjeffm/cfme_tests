@@ -1,5 +1,4 @@
 import pytest
-import cfme.web_ui.flash as flash
 import utils.randomness as rand
 from utils.update import update
 from utils import error
