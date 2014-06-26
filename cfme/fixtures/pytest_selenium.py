@@ -18,7 +18,8 @@ from utils import conf
 from selenium.common.exceptions import \
     (ErrorInResponseException, InvalidSwitchToTargetException, NoSuchAttributeException,
      NoSuchElementException, NoAlertPresentException, UnexpectedAlertPresentException,
-     InvalidElementStateException, MoveTargetOutOfBoundsException, WebDriverException)
+     InvalidElementStateException, MoveTargetOutOfBoundsException, WebDriverException,
+     StaleElementException)
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
@@ -665,10 +666,13 @@ def detect_observed_field(loc):
     If found, that interval will be used instead of the default.
 
     """
-    if is_displayed(loc):
-        el = element(loc)
-    else:
-        # Element not visible, sort out
+    try:
+        if is_displayed(loc):
+            el = element(loc)
+        else:
+            # Element not visible, sort out
+            return
+    except StaleElementException:
         return
 
     # Default wait period, based on the default UI wait (700ms)
